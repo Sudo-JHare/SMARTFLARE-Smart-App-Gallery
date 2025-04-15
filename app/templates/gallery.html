@@ -1,0 +1,247 @@
+<!---app/templates/gallery.html--->
+
+{% extends "base.html" %}
+
+{% block title %}Gallery{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <!-- Sticky Top Filter Bar -->
+        <nav class="navbar navbar-expand-lg navbar-light sticky-top shadow-sm mb-4">
+            <div class="container-fluid">
+                <span class="navbar-brand d-flex align-items-center">
+                    <img src="{{ url_for('static', filename='smartflare.png') }}" alt="SMARTFLARE" height="40" class="me-2" onerror="this.style.display='none';">
+                    Filter Apps
+                </span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#filterNavbar" aria-controls="filterNavbar" aria-expanded="false" aria-label="Toggle filters">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="filterNavbar">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link {% if not filter_params %}active{% endif %}" href="{{ url_for('gallery.gallery') }}">All Apps</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if filter_params.get('application_type') %}active{% endif %}" href="#" id="appTypeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Application Type
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="appTypeDropdown">
+                                {% for app_type in application_types %}
+                                    <li>
+                                        <a class="dropdown-item {% if app_type.id in filter_params.get('application_type', []) %}active{% endif %}" href="{{ url_for('gallery.gallery', application_type=app_type.id, **(filter_params | rejectattr('application_type'))) }}">{{ app_type.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if filter_params.get('category') %}active{% endif %}" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Categories
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                                {% for category in categories %}
+                                    <li>
+                                        <a class="dropdown-item {% if category.id in filter_params.get('category', []) %}active{% endif %}" href="{{ url_for('gallery.gallery', category=category.id, **(filter_params | rejectattr('category'))) }}">{{ category.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if filter_params.get('os_support') %}active{% endif %}" href="#" id="osSupportDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                OS Support
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="osSupportDropdown">
+                                {% for os in os_supports %}
+                                    <li>
+                                        <a class="dropdown-item {% if os.id in filter_params.get('os_support', []) %}active{% endif %}" href="{{ url_for('gallery.gallery', os_support=os.id, **(filter_params | rejectattr('os_support'))) }}">{{ os.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if filter_params.get('fhir_support') %}active{% endif %}" href="#" id="fhirSupportDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                FHIR Support
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="fhirSupportDropdown">
+                                {% for fhir in fhir_supports %}
+                                    <li>
+                                        <a class="dropdown-item {% if fhir.id in filter_params.get('fhir_support', []) %}active{% endif %}" href="{{ url_for('gallery.gallery', fhir_support=fhir.id, **(filter_params | rejectattr('fhir_support'))) }}">{{ fhir.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if filter_params.get('speciality') %}active{% endif %}" href="#" id="specialityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Speciality
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="specialityDropdown">
+                                {% for speciality in specialties %}
+                                    <li>
+                                        <a class="dropdown-item {% if speciality.id in filter_params.get('speciality', []) %}active{% endif %}" href="{{ url_for('gallery.gallery', speciality=speciality.id, **(filter_params | rejectattr('speciality'))) }}">{{ speciality.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if filter_params.get('pricing_license') %}active{% endif %}" href="#" id="pricingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Pricing/License
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="pricingDropdown">
+                                {% for pricing in pricing_licenses %}
+                                    <li>
+                                        <a class="dropdown-item {% if pricing.id in filter_params.get('pricing_license', []) %}active{% endif %}" href="{{ url_for('gallery.gallery', pricing_license=pricing.id, **(filter_params | rejectattr('pricing_license'))) }}">{{ pricing.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if filter_params.get('designed_for') %}active{% endif %}" href="#" id="designedForDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Designed For
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="designedForDropdown">
+                                {% for designed in designed_fors %}
+                                    <li>
+                                        <a class="dropdown-item {% if designed.id in filter_params.get('designed_for', []) %}active{% endif %}" href="{{ url_for('gallery.gallery', designed_for=designed.id, **(filter_params | rejectattr('designed_for'))) }}">{{ designed.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if filter_params.get('ehr_support') %}active{% endif %}" href="#" id="ehrSupportDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                EHR Support
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="ehrSupportDropdown">
+                                {% for ehr in ehr_supports %}
+                                    <li>
+                                        <a class="dropdown-item {% if ehr.id in filter_params.get('ehr_support', []) %}active{% endif %}" href="{{ url_for('gallery.gallery', ehr_support=ehr.id, **(filter_params | rejectattr('ehr_support'))) }}">{{ ehr.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- App Cards -->
+        <div class="container mt-4">
+            <p>Explore SMART on FHIR apps. Filter above to find the perfect app.</p>
+            {% if apps %}
+                <div class="row">
+                    {% for app in apps %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card app-card shadow-sm h-100">
+                                {% if app.logo_url %}
+                                    <img src="{{ app.logo_url }}" class="card-img-top" alt="{{ app.name }} logo" style="max-height: 150px; object-fit: contain; padding: 1rem;" onerror="this.style.display='none';">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/150?text=No+Logo" class="card-img-top" alt="No Logo" style="max-height: 150px; object-fit: contain; padding: 1rem;">
+                                {% endif %}
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ app.name }}</h5>
+                                    <p class="card-text flex-grow-1">{{ app.description | truncate(100) }}</p>
+                                    <p class="card-text"><small class="text-muted">By {{ app.developer }}</small></p>
+                                    <a href="{{ url_for('gallery.app_detail', app_id=app.id) }}" class="btn btn-primary mt-auto">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No apps match your filters. Try adjusting the filters above.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Custom CSS for Pretty UI -->
+    <style>
+        .navbar-light {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #007bff !important;
+        }
+        .nav-link {
+            color: #333 !important;
+            transition: color 0.2s ease;
+        }
+        .nav-link:hover {
+            color: #007bff !important;
+        }
+        .nav-link.active {
+            color: #007bff !important;
+            font-weight: bold;
+            border-bottom: 2px solid #007bff;
+        }
+        .dropdown-menu {
+            animation: fadeIn 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            transition: background-color 0.2s ease;
+        }
+        .dropdown-item:hover {
+            background-color: #e9ecef;
+        }
+        .dropdown-item.active {
+            background-color: #007bff;
+            color: white !important;
+        }
+        .app-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+        .card-img-top {
+            background-color: #f8f9fa;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dark-mode .navbar-light {
+            background-color: #343a40 !important;
+            border-bottom: 1px solid #495057;
+        }
+        .dark-mode .nav-link {
+            color: #f8f9fa !important;
+        }
+        .dark-mode .nav-link:hover, .dark-mode .nav-link.active {
+            color: #4dabf7 !important;
+            border-bottom: 2px solid #4dabf7;
+        }
+        .dark-mode .dropdown-menu {
+            background-color: #495057;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .dark-mode .dropdown-item {
+            color: #f8f9fa;
+        }
+        .dark-mode .dropdown-item:hover {
+            background-color: #6c757d;
+        }
+        .dark-mode .dropdown-item.active {
+            background-color: #4dabf7;
+        }
+        .dark-mode .app-card {
+            background-color: #343a40;
+            color: #f8f9fa;
+        }
+        .dark-mode .card-img-top {
+            background-color: #495057;
+        }
+        .dark-mode .text-muted {
+            color: #adb5bd !important;
+        }
+        .dark-mode .navbar-brand {
+            color: #4dabf7 !important;
+        }
+    </style>
+{% endblock %}

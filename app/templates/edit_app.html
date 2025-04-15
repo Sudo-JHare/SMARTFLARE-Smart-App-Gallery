@@ -1,0 +1,214 @@
+<!--app/templates/edit_app.html-->
+
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Edit App: {{ app.name }}</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
+            {% for error in form.name.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control", rows=4) }}
+            {% for error in form.description.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.developer.label(class="form-label") }}
+            {{ form.developer(class="form-control") }}
+            {% for error in form.developer.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.contact_email.label(class="form-label") }}
+            {{ form.contact_email(class="form-control") }}
+            {% for error in form.contact_email.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.logo_url.label(class="form-label") }}
+            {{ form.logo_url(class="form-control") }}
+            <small class="form-text text-muted">Enter a URL or upload a new logo below. Leave blank to keep current logo.</small>
+            {% for error in form.logo_url.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {% if app.logo_url %}
+                <p class="mt-2"><strong>Current Logo:</strong></p>
+                <img src="{{ app.logo_url }}" alt="Current Logo" style="max-height: 100px;">
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.logo_upload.label(class="form-label") }}
+            {{ form.logo_upload(class="form-control") }}
+            {% for error in form.logo_upload.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.launch_url.label(class="form-label") }}
+            {{ form.launch_url(class="form-control") }}
+            {% for error in form.launch_url.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.client_id.label(class="form-label") }}
+            {{ form.client_id(class="form-control") }}
+            {% for error in form.client_id.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.scopes.label(class="form-label") }}
+            {{ form.scopes(class="form-control", rows=3) }}
+            {% for error in form.scopes.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {% if app.scopes and app.scopes.strip() %}
+                <p class="mt-2"><strong>Current Scopes:</strong>
+                    {% for scope in app.scopes.split(',') %}
+                        {% if scope.strip() %}
+                            <span class="badge bg-primary me-1">{{ scope.strip() }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </p>
+            {% else %}
+                <p class="mt-2 text-muted">No scopes defined.</p>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.website.label(class="form-label") }}
+            {{ form.website(class="form-control") }}
+            {% for error in form.website.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.designed_for.label(class="form-label") }}
+            {{ form.designed_for(class="form-control") }}
+            {% for error in form.designed_for.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {{ form.designed_for_new.label(class="form-label mt-2") }}
+            {{ form.designed_for_new(class="form-control") }}
+            {% for error in form.designed_for_new.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.application_type.label(class="form-label") }}
+            {{ form.application_type(class="form-control") }}
+            {% for error in form.application_type.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {{ form.application_type_new.label(class="form-label mt-2") }}
+            {{ form.application_type_new(class="form-control") }}
+            {% for error in form.application_type_new.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.fhir_compatibility.label(class="form-label") }}
+            {{ form.fhir_compatibility(class="form-control") }}
+            {% for error in form.fhir_compatibility.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {{ form.fhir_compatibility_new.label(class="form-label mt-2") }}
+            {{ form.fhir_compatibility_new(class="form-control") }}
+            {% for error in form.fhir_compatibility_new.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.categories.label(class="form-label") }}
+            {{ form.categories(class="form-control") }}
+            {% for error in form.categories.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {{ form.categories_new.label(class="form-label mt-2") }}
+            {{ form.categories_new(class="form-control") }}
+            {% for error in form.categories_new.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.specialties.label(class="form-label") }}
+            {{ form.specialties(class="form-control") }}
+            {% for error in form.specialties.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {{ form.specialties_new.label(class="form-label mt-2") }}
+            {{ form.specialties_new(class="form-control") }}
+            {% for error in form.specialties_new.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.licensing_pricing.label(class="form-label") }}
+            {{ form.licensing_pricing(class="form-control") }}
+            {% for error in form.licensing_pricing.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {{ form.licensing_pricing_new.label(class="form-label mt-2") }}
+            {{ form.licensing_pricing_new(class="form-control") }}
+            {% for error in form.licensing_pricing_new.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.os_support.label(class="form-label") }}
+            {{ form.os_support(class="form-control") }}
+            {% for error in form.os_support.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {{ form.os_support_new.label(class="form-label mt-2") }}
+            {{ form.os_support_new(class="form-control") }}
+            {% for error in form.os_support_new.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.app_image_urls.label(class="form-label") }}
+            {{ form.app_image_urls(class="form-control", rows=3) }}
+            {% for error in form.app_image_urls.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {% if app.app_images %}
+                <p class="mt-2"><strong>Current Images:</strong></p>
+                {% for image in app.app_images.split(',') %}
+                    <img src="{{ image }}" alt="App Image" style="max-height: 100px; margin: 5px;">
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            {{ form.app_image_uploads.label(class="form-label") }}
+            {{ form.app_image_uploads(class="form-control") }}
+            {% for error in form.app_image_uploads.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.ehr_support.label(class="form-label") }}
+            {{ form.ehr_support(class="form-control") }}
+            {% for error in form.ehr_support.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {{ form.ehr_support_new.label(class="form-label mt-2") }}
+            {{ form.ehr_support_new(class="form-control") }}
+            {% for error in form.ehr_support_new.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('gallery.app_detail', app_id=app.id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+{% endblock %}

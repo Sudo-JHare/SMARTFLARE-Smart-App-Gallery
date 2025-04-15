@@ -1,0 +1,33 @@
+<!--app/templates/my_listings.html-->
+
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>My Listings</h1>
+    {% if apps %}
+        <div class="row">
+            {% for app in apps %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        {% if app.logo_url %}
+                            <img src="{{ app.logo_url }}" class="card-img-top" alt="{{ app.name }} logo" style="max-height: 150px; object-fit: contain;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ app.name }}</h5>
+                            <p class="card-text">{{ app.description | truncate(100) }}</p>
+                            <p class="card-text"><small class="text-muted">By {{ app.developer }}</small></p>
+                            <a href="{{ url_for('gallery.app_detail', app_id=app.id) }}" class="btn btn-primary">View Details</a>
+                            <a href="{{ url_for('gallery.edit_app', app_id=app.id) }}" class="btn btn-warning btn-sm">Edit</a>
+                            <form action="{{ url_for('gallery.delete_app', app_id=app.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete {{ app.name }}?')">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>You haven't registered any apps yet.</p>
+        <a href="{{ url_for('gallery.register') }}" class="btn btn-primary">Register an App</a>
+    {% endif %}
+{% endblock %}

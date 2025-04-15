@@ -1,0 +1,58 @@
+<!---app/templates/app_detail.html--->
+
+
+{% extends "base.html" %}
+
+{% block title %}{{ app.name }}{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1>{{ app.name }}</h1>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% if app.logo_url %}
+                    <img src="{{ app.logo_url }}" alt="{{ app.name }} logo" style="max-height: 200px; object-fit: contain; margin-bottom: 1rem;" onerror="this.style.display='none';">
+                {% else %}
+                    <img src="https://via.placeholder.com/200?text=No+Logo" alt="No Logo" style="max-height: 200px; object-fit: contain; margin-bottom: 1rem;">
+                {% endif %}
+                <p><strong>Description:</strong> {{ app.description }}</p>
+                <p><strong>Developer:</strong> {{ app.developer }}</p>
+                <p><strong>Contact Email:</strong> {{ app.contact_email }}</p>
+                <p><strong>Launch URL:</strong> <a href="{{ app.launch_url }}">{{ app.launch_url }}</a></p>
+                <p><strong>Client ID:</strong> {{ app.client_id }}</p>
+                <p><strong>Scopes:</strong> {{ app.scopes }}</p>
+                {% if app.website %}
+                    <p><strong>Website:</strong> <a href="{{ app.website }}">{{ app.website }}</a></p>
+                {% endif %}
+                {% if app_categories %}
+                    <p><strong>Categories:</strong> {{ app_categories | map(attribute='name') | join(', ') }}</p>
+                {% endif %}
+                {% if app_specialties %}
+                    <p><strong>Specialties:</strong> {{ app_specialties | map(attribute='name') | join(', ') }}</p>
+                {% endif %}
+                {% if app_os_supports %}
+                    <p><strong>OS Support:</strong> {{ app_os_supports | map(attribute='name') | join(', ') }}</p>
+                {% endif %}
+                {% if app_ehr_supports %}
+                    <p><strong>EHR Support:</strong> {{ app_ehr_supports | map(attribute='name') | join(', ') }}</p>
+                {% endif %}
+                {% if app.app_images %}
+                    <h5>Additional Images:</h5>
+                    <div class="row">
+                        {% for img_url in app.app_images.split(',') %}
+                            <div class="col-md-4 mb-3">
+                                <img src="{{ img_url }}" alt="App Image" style="max-height: 150px; object-fit: contain;" onerror="this.style.display='none';">
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if current_user.is_authenticated and current_user.id == app.user_id %}
+                    <a href="{{ url_for('gallery.edit_app', app_id=app.id) }}" class="btn btn-primary">Edit App</a>
+                    <form action="{{ url_for('gallery.delete_app', app_id=app.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this app?');">Delete App</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
