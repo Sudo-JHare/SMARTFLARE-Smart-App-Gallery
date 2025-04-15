@@ -1,11 +1,29 @@
+<!--app/templates/base.html-->
 <!DOCTYPE html>
-<html lang="en"> <head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <title>SMARTFLARE - Smart App Gallery - {% block title %}{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
         /* Default (Light Theme) Styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
+        main {
+            flex-grow: 1;
+        }
+        h1, h5 {
+            font-weight: 600;
+        }
         .navbar-light {
             background-color: #ffffff !important;
             border-bottom: 1px solid #e0e0e0;
@@ -47,7 +65,6 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             border-radius: 10px;
             overflow: hidden;
-            /* Add default background/color if needed for light mode explicitly */
             background-color: #ffffff;
             color: #212529;
         }
@@ -58,36 +75,75 @@
         .card-img-top {
             background-color: #f8f9fa;
         }
-        body {
-             /* Default body styles for light mode */
-             background-color: #f8f9fa; /* Example light background */
-             color: #212529; /* Default text color */
-        }
         .card {
-             /* Default card styles */
             background-color: #ffffff;
         }
         .text-muted {
-            /* Ensure default */
-             color: #6c757d !important;
+            color: #6c757d !important;
         }
-
-
+        .form-check-input:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .form-check-label i {
+            font-size: 1.2rem;
+            margin-left: 0.5rem;
+        }
+        .navbar-controls {
+            gap: 0.5rem;
+            padding-right: 0;
+        }
+        .navbar-search input,
+        .view-toggle {
+            height: 38px;
+        }
+        .navbar-search {
+            width: 200px;
+        }
+        .nav-link.login-link {
+            line-height: 38px;
+            padding: 0 0.5rem;
+        }
+        /* Footer Styles */
+        footer {
+            background-color: #ffffff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        .footer-left,
+        .footer-right {
+            display: inline-flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        .footer-left a,
+        .footer-right a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .footer-left a:hover,
+        .footer-right a:hover {
+            text-decoration: underline;
+        }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Dark Theme Styles - Triggered by html[data-theme="dark"] */
+        /* Dark Theme Styles */
         html[data-theme="dark"] body {
-            background-color: #212529; /* Dark background for body */
-            color: #f8f9fa; /* Light text */
+            background-color: #212529;
+            color: #f8f9fa;
         }
         html[data-theme="dark"] .navbar-light {
             background-color: #343a40 !important;
             border-bottom: 1px solid #495057;
         }
-         html[data-theme="dark"] .navbar-brand { /* Override brand color */
+        html[data-theme="dark"] .navbar-brand {
             color: #4dabf7 !important;
         }
         html[data-theme="dark"] .nav-link {
@@ -96,7 +152,7 @@
         html[data-theme="dark"] .nav-link:hover,
         html[data-theme="dark"] .nav-link.active {
             color: #4dabf7 !important;
-            border-bottom-color: #4dabf7; /* Ensure border color matches */
+            border-bottom-color: #4dabf7;
         }
         html[data-theme="dark"] .dropdown-menu {
             background-color: #495057;
@@ -110,73 +166,117 @@
         }
         html[data-theme="dark"] .dropdown-item.active {
             background-color: #4dabf7;
-            color: white !important; /* Ensure text stays white */
+            color: white !important;
         }
         html[data-theme="dark"] .app-card {
             background-color: #343a40;
             color: #f8f9fa;
-             border: 1px solid #495057; /* Optional: add border for contrast */
+            border: 1px solid #495057;
         }
-         html[data-theme="dark"] .card { /* General card styling */
-             background-color: #343a40;
-             border: 1px solid #495057;
-         }
+        html[data-theme="dark"] .card {
+            background-color: #343a40;
+            border: 1px solid #495057;
+        }
         html[data-theme="dark"] .card-img-top {
             background-color: #495057;
         }
         html[data-theme="dark"] .text-muted {
             color: #adb5bd !important;
         }
-        /* Add any other specific dark mode overrides */
         html[data-theme="dark"] h1,
         html[data-theme="dark"] h5 {
-             color: #f8f9fa; /* Ensure headings are light */
+            color: #f8f9fa;
         }
         html[data-theme="dark"] .form-label {
-             color: #f8f9fa; /* Form labels */
+            color: #f8f9fa;
         }
-         html[data-theme="dark"] .form-control {
-             background-color: #495057;
-             color: #f8f9fa;
-             border-color: #6c757d;
-         }
-         html[data-theme="dark"] .form-control::placeholder {
+        html[data-theme="dark"] .form-control {
+            background-color: #495057;
+            color: #f8f9fa;
+            border-color: #6c757d;
+        }
+        html[data-theme="dark"] .form-control::placeholder {
             color: #adb5bd;
-         }
-         html[data-theme="dark"] .form-select {
-             background-color: #495057;
-             color: #f8f9fa;
-             border-color: #6c757d;
-         }
-         html[data-theme="dark"] .alert-danger {
-             background-color: #dc3545; /* Keep alerts visible */
-             color: white;
-             border-color: #dc3545;
-         }
-         html[data-theme="dark"] .alert-success {
-              background-color: #198754;
-              color: white;
-              border-color: #198754;
-         }
-         /* Ensure avatar styles work in dark mode if needed */
-         .initials-avatar {
-             display: inline-block;
-             width: 30px;
-             height: 30px;
-             border-radius: 50%;
-             background-color: #007bff; /* Or another color */
-             color: white;
-             text-align: center;
-             line-height: 30px;
-             font-weight: bold;
-             font-size: 14px;
-             vertical-align: middle;
-         }
-         .user-avatar {
-             border-radius: 50%;
-             vertical-align: middle;
-         }
-
+        }
+        html[data-theme="dark"] .form-select {
+            background-color: #495057;
+            color: #f8f9fa;
+            border-color: #6c757d;
+        }
+        html[data-theme="dark"] .alert-danger {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        html[data-theme="dark"] .alert-success {
+            background-color: #198754;
+            color: white;
+            border-color: #198754;
+        }
+        html[data-theme="dark"] .form-check-input:checked {
+            background-color: #4dabf7;
+            border-color: #4dabf7;
+        }
+        html[data-theme="dark"] footer {
+            background-color: #343a40;
+            border-top: 1px solid #495057;
+        }
+        html[data-theme="dark"] .footer-left a,
+        html[data-theme="dark"] .footer-right a {
+            color: #4dabf7;
+        }
+        .initials-avatar {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        .user-avatar {
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+        @media (max-width: 576px) {
+            .navbar-controls {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+            }
+            .navbar-search {
+                width: 100%;
+            }
+            .navbar-search input,
+            .view-toggle {
+                width: 100%;
+            }
+            .navbar-controls .nav-link,
+            .navbar-controls .form-check,
+            .navbar-controls .dropdown {
+                margin-bottom: 0.5rem;
+            }
+            footer {
+                height: auto;
+                padding: 0.5rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .footer-left,
+            .footer-right {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            .footer-left a,
+            .footer-right a {
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -184,9 +284,10 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('gallery.gallery') }}">SMART App Gallery</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span> </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarNav">
+                <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'gallery.gallery' %}active{% endif %}" href="{{ url_for('gallery.gallery') }}">Gallery</a>
                     </li>
@@ -196,93 +297,165 @@
                         </li>
                     {% endif %}
                 </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <button type="button" class="nav-link theme-toggle" onclick="toggleTheme()" style="background:none; border:none; padding:inherit; cursor:pointer; display:inline-block; line-height:inherit;">Toggle Theme</button>
-                    </li>
+                <div class="navbar-controls d-flex align-items-center ms-auto">
+                    {% if request.endpoint == 'gallery.gallery' %}
+                        <form class="navbar-search d-flex" method="GET" action="{{ url_for('gallery.gallery') }}">
+                            <input class="form-control form-control-sm me-2" type="search" name="search" placeholder="Search apps..." aria-label="Search apps by name, description, or developer" value="{{ request.args.get('search', '') }}">
+                            <button class="btn btn-outline-primary btn-sm" type="submit"><i class="fas fa-search"></i></button>
+                        </form>
+                        <button class="btn btn-outline-secondary btn-sm view-toggle" id="viewToggle" onclick="toggleView()" aria-label="Toggle between grid and list view">
+                            <i class="fas fa-th"></i> <span id="viewText">Grid View</span>
+                        </button>
+                    {% endif %}
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="themeToggle" onchange="toggleTheme()" aria-label="Toggle dark mode" {% if request.cookies.get('theme') == 'dark' %}checked{% endif %}>
+                        <label class="form-check-label" for="themeToggle">
+                            <i class="fas fa-sun"></i>
+                            <i class="fas fa-moon d-none"></i>
+                        </label>
+                    </div>
                     {% if current_user.is_authenticated %}
-                        <li class="nav-item dropdown">
+                        <div class="dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% if current_user.email and current_user.email | md5 %}
-                                    <img src="https://www.gravatar.com/avatar/{{ current_user.email | md5 }}?s=30&d=identicon" class="user-avatar" alt="User Avatar">
+                                    <img src="https://www.gravatar.com/avatar/{{ current_user.email | md5 }}?s: not found
                                 {% else %}
-                                     <span class="initials-avatar">{{ current_user.username[:2] | upper }}</span>
+                                    <span class="initials-avatar">{{ current_user.username[:2] | upper }}</span>
                                 {% endif %}
-                                {{ current_user.username }} </a>
+                                {{ current_user.username }}
+                            </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item {% if request.endpoint == 'gallery.my_listings' %}active{% endif %}" href="{{ url_for('gallery.my_listings') }}">My Listings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
                             </ul>
-                        </li>
+                        </div>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}" href="{{ url_for('auth.login') }}">Login</a>
-                        </li>
-                         <li class="nav-item">
-                             <a class="nav-link {% if request.endpoint == 'auth.register' %}active{% endif %}" href="{{ url_for('auth.register') }}">Register</a>
-                        </li>
+                        <a class="nav-link login-link {% if request.endpoint == 'auth.login' %}active{% endif %}" href="{{ url_for('auth.login') }}">Login</a>
+                        <a class="nav-link login-link {% if request.endpoint == 'auth.register' %}active{% endif %}" href="{{ url_for('auth.register') }}">Register</a>
                     {% endif %}
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
-    <div class="container mt-4">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        {% block content %}{% endblock %}
-    </div>
+    <main class="flex-grow-1">
+        <div class="container mt-4">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    <footer class="main-footer" role="contentinfo">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="footer-left">
+                    <a href="https://smarthealthit.org/" target="_blank" rel="noreferrer" aria-label="Visit SMART on FHIR website">SMART on FHIR</a>
+                    <a href="/about" aria-label="Learn about SMART App Gallery">What is SMART Gallery</a>
+                    <a href="https://www.hl7.org/fhir/" target="_blank" rel="noreferrer" aria-label="Visit FHIR website">FHIR</a>
+                    <a href="mailto:support@smartflare.com" aria-label="Contact SMARTFLARE support">Contact Us</a>
+                </div>
+                <div class="footer-right">
+                    <a href="/documents/privacy.pdf" aria-label="View Privacy Policy">Privacy</a>
+                    <a href="/documents/terms.pdf" aria-label="View Terms of Use">Terms of Use</a>
+                    <a href="/documents/disclaimer.pdf" aria-label="View Disclaimer">Disclaimer</a>
+                </div>
+            </div>
+        </div>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script>
         function toggleTheme() {
             const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            if (currentTheme === 'dark') {
-                html.removeAttribute('data-theme');
-                localStorage.setItem('theme', 'light');
-            } else {
+            const toggle = document.getElementById('themeToggle');
+            const sunIcon = document.querySelector('.fa-sun');
+            const moonIcon = document.querySelector('.fa-moon');
+            if (toggle.checked) {
                 html.setAttribute('data-theme', 'dark');
                 localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('d-none');
+                moonIcon.classList.remove('d-none');
+            } else {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('d-none');
+                moonIcon.classList.add('d-none');
             }
         }
 
-        // Apply the saved theme on initial load
+        function toggleView() {
+            const container = document.getElementById('appContainer');
+            const table = document.getElementById('appTable');
+            const toggle = document.getElementById('viewToggle');
+            const viewText = document.getElementById('viewText');
+            if (!container || !table) return;
+            if (container.classList.contains('d-none')) {
+                container.classList.remove('d-none');
+                table.classList.add('d-none');
+                viewText.textContent = 'Grid View';
+                toggle.querySelector('i').className = 'fas fa-th';
+                localStorage.setItem('view', 'grid');
+            } else {
+                container.classList.add('d-none');
+                table.classList.remove('d-none');
+                viewText.textContent = 'List View';
+                toggle.querySelector('i').className = 'fas fa-list';
+                localStorage.setItem('view', 'list');
+            }
+        }
+
+        function removeFilter(key, value) {
+            const url = new URL(window.location);
+            const params = new URLSearchParams(url.search);
+            if (key === 'search') {
+                params.delete('search');
+            } else {
+                const values = params.getAll(key).filter(v => v !== value.toString());
+                params.delete(key);
+                values.forEach(v => params.append(key, v));
+            }
+            window.location.href = `${url.pathname}?${params.toString()}`;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
+            const themeToggle = document.getElementById('themeToggle');
+            const sunIcon = document.querySelector('.fa-sun');
+            const moonIcon = document.querySelector('.fa-moon');
+            if (savedTheme === 'dark' && themeToggle) {
                 document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.checked = true;
+                sunIcon.classList.add('d-none');
+                moonIcon.classList.remove('d-none');
             }
-             // Optional: Set to light explicitly if needed, though lack of attribute usually defaults to light
-             // else {
-             //    document.documentElement.removeAttribute('data-theme');
-             // }
-
-             // Add active class to nav links based on current page
-             const currentPath = window.location.pathname;
-             document.querySelectorAll('#navbarNav .nav-link').forEach(link => {
-                 if (link.getAttribute('href') === currentPath) {
-                     link.classList.add('active');
-                 } else {
-                     link.classList.remove('active'); // Ensure others aren't marked active
-                 }
-             });
-             // Handle dropdown item active state similarly if needed
-              document.querySelectorAll('#userDropdown + .dropdown-menu .dropdown-item').forEach(link => {
-                 if (link.getAttribute('href') === currentPath) {
-                     link.classList.add('active');
-                 } else {
-                     link.classList.remove('active');
-                 }
-             });
-
+            const savedView = localStorage.getItem('view');
+            if (savedView === 'list' && document.getElementById('viewToggle')) {
+                toggleView();
+            }
+            const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            tooltips.forEach(t => new bootstrap.Tooltip(t));
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('#navbarNav .nav-link').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+            document.querySelectorAll('#userDropdown + .dropdown-menu .dropdown-item').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
         });
     </script>
 </body>
