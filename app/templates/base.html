@@ -1,13 +1,11 @@
-<!---app/templates/base.html--->
-
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"> <head>
     <meta charset="UTF-8">
     <title>SMARTFLARE - Smart App Gallery - {% block title %}{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
+        /* Default (Light Theme) Styles */
         .navbar-light {
             background-color: #ffffff !important;
             border-bottom: 1px solid #e0e0e0;
@@ -49,6 +47,9 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             border-radius: 10px;
             overflow: hidden;
+            /* Add default background/color if needed for light mode explicitly */
+            background-color: #ffffff;
+            color: #212529;
         }
         .app-card:hover {
             transform: translateY(-5px);
@@ -57,47 +58,125 @@
         .card-img-top {
             background-color: #f8f9fa;
         }
+        body {
+             /* Default body styles for light mode */
+             background-color: #f8f9fa; /* Example light background */
+             color: #212529; /* Default text color */
+        }
+        .card {
+             /* Default card styles */
+            background-color: #ffffff;
+        }
+        .text-muted {
+            /* Ensure default */
+             color: #6c757d !important;
+        }
+
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .dark-mode .navbar-light {
+
+        /* Dark Theme Styles - Triggered by html[data-theme="dark"] */
+        html[data-theme="dark"] body {
+            background-color: #212529; /* Dark background for body */
+            color: #f8f9fa; /* Light text */
+        }
+        html[data-theme="dark"] .navbar-light {
             background-color: #343a40 !important;
             border-bottom: 1px solid #495057;
         }
-        .dark-mode .nav-link {
+         html[data-theme="dark"] .navbar-brand { /* Override brand color */
+            color: #4dabf7 !important;
+        }
+        html[data-theme="dark"] .nav-link {
             color: #f8f9fa !important;
         }
-        .dark-mode .nav-link:hover, .dark-mode .nav-link.active {
+        html[data-theme="dark"] .nav-link:hover,
+        html[data-theme="dark"] .nav-link.active {
             color: #4dabf7 !important;
-            border-bottom: 2px solid #4dabf7;
+            border-bottom-color: #4dabf7; /* Ensure border color matches */
         }
-        .dark-mode .dropdown-menu {
+        html[data-theme="dark"] .dropdown-menu {
             background-color: #495057;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
-        .dark-mode .dropdown-item {
+        html[data-theme="dark"] .dropdown-item {
             color: #f8f9fa;
         }
-        .dark-mode .dropdown-item:hover {
+        html[data-theme="dark"] .dropdown-item:hover {
             background-color: #6c757d;
         }
-        .dark-mode .dropdown-item.active {
+        html[data-theme="dark"] .dropdown-item.active {
             background-color: #4dabf7;
+            color: white !important; /* Ensure text stays white */
         }
-        .dark-mode .app-card {
+        html[data-theme="dark"] .app-card {
             background-color: #343a40;
             color: #f8f9fa;
+             border: 1px solid #495057; /* Optional: add border for contrast */
         }
-        .dark-mode .card-img-top {
+         html[data-theme="dark"] .card { /* General card styling */
+             background-color: #343a40;
+             border: 1px solid #495057;
+         }
+        html[data-theme="dark"] .card-img-top {
             background-color: #495057;
         }
-        .dark-mode .text-muted {
+        html[data-theme="dark"] .text-muted {
             color: #adb5bd !important;
         }
-        .dark-mode .navbar-brand {
-            color: #4dabf7 !important;
+        /* Add any other specific dark mode overrides */
+        html[data-theme="dark"] h1,
+        html[data-theme="dark"] h5 {
+             color: #f8f9fa; /* Ensure headings are light */
         }
+        html[data-theme="dark"] .form-label {
+             color: #f8f9fa; /* Form labels */
+        }
+         html[data-theme="dark"] .form-control {
+             background-color: #495057;
+             color: #f8f9fa;
+             border-color: #6c757d;
+         }
+         html[data-theme="dark"] .form-control::placeholder {
+            color: #adb5bd;
+         }
+         html[data-theme="dark"] .form-select {
+             background-color: #495057;
+             color: #f8f9fa;
+             border-color: #6c757d;
+         }
+         html[data-theme="dark"] .alert-danger {
+             background-color: #dc3545; /* Keep alerts visible */
+             color: white;
+             border-color: #dc3545;
+         }
+         html[data-theme="dark"] .alert-success {
+              background-color: #198754;
+              color: white;
+              border-color: #198754;
+         }
+         /* Ensure avatar styles work in dark mode if needed */
+         .initials-avatar {
+             display: inline-block;
+             width: 30px;
+             height: 30px;
+             border-radius: 50%;
+             background-color: #007bff; /* Or another color */
+             color: white;
+             text-align: center;
+             line-height: 30px;
+             font-weight: bold;
+             font-size: 14px;
+             vertical-align: middle;
+         }
+         .user-avatar {
+             border-radius: 50%;
+             vertical-align: middle;
+         }
+
     </style>
 </head>
 <body>
@@ -105,22 +184,21 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('gallery.gallery') }}">SMART App Gallery</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+                <span class="navbar-toggler-icon"></span> </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('gallery.gallery') }}">Gallery</a>
+                        <a class="nav-link {% if request.endpoint == 'gallery.gallery' %}active{% endif %}" href="{{ url_for('gallery.gallery') }}">Gallery</a>
                     </li>
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('gallery.register') }}">Register App</a>
+                            <a class="nav-link {% if request.endpoint == 'gallery.register' %}active{% endif %}" href="{{ url_for('gallery.register') }}">Register App</a>
                         </li>
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <span class="nav-link theme-toggle" onclick="toggleTheme()">Toggle Theme</span>
+                        <button type="button" class="nav-link theme-toggle" onclick="toggleTheme()" style="background:none; border:none; padding:inherit; cursor:pointer; display:inline-block; line-height:inherit;">Toggle Theme</button>
                     </li>
                     {% if current_user.is_authenticated %}
                         <li class="nav-item dropdown">
@@ -128,17 +206,21 @@
                                 {% if current_user.email and current_user.email | md5 %}
                                     <img src="https://www.gravatar.com/avatar/{{ current_user.email | md5 }}?s=30&d=identicon" class="user-avatar" alt="User Avatar">
                                 {% else %}
-                                    <div class="initials-avatar">{{ current_user.username[:2] | upper }}</div>
+                                     <span class="initials-avatar">{{ current_user.username[:2] | upper }}</span>
                                 {% endif %}
-                            </a>
+                                {{ current_user.username }} </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('gallery.my_listings') }}">My Listings</a></li>
+                                <li><a class="dropdown-item {% if request.endpoint == 'gallery.my_listings' %}active{% endif %}" href="{{ url_for('gallery.my_listings') }}">My Listings</a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                            <a class="nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}" href="{{ url_for('auth.login') }}">Login</a>
+                        </li>
+                         <li class="nav-item">
+                             <a class="nav-link {% if request.endpoint == 'auth.register' %}active{% endif %}" href="{{ url_for('auth.register') }}">Register</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -172,11 +254,35 @@
             }
         }
 
+        // Apply the saved theme on initial load
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
             }
+             // Optional: Set to light explicitly if needed, though lack of attribute usually defaults to light
+             // else {
+             //    document.documentElement.removeAttribute('data-theme');
+             // }
+
+             // Add active class to nav links based on current page
+             const currentPath = window.location.pathname;
+             document.querySelectorAll('#navbarNav .nav-link').forEach(link => {
+                 if (link.getAttribute('href') === currentPath) {
+                     link.classList.add('active');
+                 } else {
+                     link.classList.remove('active'); // Ensure others aren't marked active
+                 }
+             });
+             // Handle dropdown item active state similarly if needed
+              document.querySelectorAll('#userDropdown + .dropdown-menu .dropdown-item').forEach(link => {
+                 if (link.getAttribute('href') === currentPath) {
+                     link.classList.add('active');
+                 } else {
+                     link.classList.remove('active');
+                 }
+             });
+
         });
     </script>
 </body>

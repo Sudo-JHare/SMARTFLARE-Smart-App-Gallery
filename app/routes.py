@@ -1,5 +1,5 @@
 #app/routes.py
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, send_from_directory, abort # Added send_from_directory and abort
 from flask_login import login_required, current_user
 from app import db
 from app.models import SmartApp, ApplicationType, Category, OSSupport, FHIRSupport, Speciality, PricingLicense, DesignedFor, EHRSupport
@@ -16,11 +16,24 @@ logger = logging.getLogger(__name__)
 
 gallery_bp = Blueprint('gallery', __name__)
 
+# Absolute path to the upload folder inside the container
 UPLOAD_FOLDER = '/app/uploads/'
 ALLOWED_EXTENSIONS = {'jpg', 'png'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# New route to serve uploaded files
+@gallery_bp.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    # Use the absolute path to the directory inside the container
+    absolute_upload_folder = os.path.abspath(UPLOAD_FOLDER)
+    logger.debug(f"Attempting to serve file: {filename} from {absolute_upload_folder}")
+    try:
+        return send_from_directory(absolute_upload_folder, filename)
+    except FileNotFoundError:
+        logger.error(f"File not found: {os.path.join(absolute_upload_folder, filename)}")
+        abort(404)
 
 @gallery_bp.route('/')
 def index():
@@ -92,22 +105,22 @@ def app_detail(app_id):
     if app.categories:
         category_ids = [int(cid) for cid in app.categories.split(',') if cid]
         app_categories = Category.query.filter(Category.id.in_(category_ids)).all()
-    
+
     app_specialties = []
     if app.specialties:
         speciality_ids = [int(sid) for sid in app.specialties.split(',') if sid]
         app_specialties = Speciality.query.filter(Speciality.id.in_(speciality_ids)).all()
-    
+
     app_os_supports = []
     if app.os_support:
         os_ids = [int(oid) for oid in app.os_support.split(',') if oid]
         app_os_supports = OSSupport.query.filter(OSSupport.id.in_(os_ids)).all()
-    
+
     app_ehr_supports = []
     if app.ehr_support:
         ehr_ids = [int(eid) for eid in app.ehr_support.split(',') if eid]
         app_ehr_supports = EHRSupport.query.filter(EHRSupport.id.in_(ehr_ids)).all()
-    
+
     return render_template(
         'app_detail.html',
         app=app,
@@ -134,6 +147,7 @@ def register():
 
         # Ensure upload folder exists
         try:
+            # Use the absolute path inside the container
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
             logger.debug(f"Ensured {UPLOAD_FOLDER} exists")
         except Exception as e:
@@ -189,6 +203,7 @@ def register():
             file = form.logo_upload.data
             if allowed_file(file.filename):
                 filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
+                # Use absolute path for saving
                 save_path = os.path.join(UPLOAD_FOLDER, filename)
                 logger.debug(f"Attempting to save logo to {save_path}")
                 try:
@@ -199,7 +214,8 @@ def register():
                         logger.error(f"Failed to save logo to {save_path}")
                         flash('Failed to save logo.', 'danger')
                         return render_template('register.html', form=form)
-                    logo_url = f"/app/uploads/{filename}"
+                    # Store URL path for web access
+                    logo_url = f"/uploads/{filename}" # CHANGED
                     logger.debug(f"Set logo_url to {logo_url}")
                 except Exception as e:
                     logger.error(f"Error saving logo to {save_path}: {e}")
@@ -209,11 +225,13 @@ def register():
         # Handle app images
         app_images = []
         if form.app_image_urls.data:
-            app_images.extend([url.strip() for url in form.app_image_urls.data.splitlines() if url.strip()])
-        if form.app_image_uploads.data:
+            # Keep existing URLs if they are valid URLs
+            app_images.extend([url.strip() for url in form.app_image_urls.data.splitlines() if url.strip().startswith(('http://', 'https://'))])
+        if form.app_image_uploads.data: # Check if a file was uploaded
             file = form.app_image_uploads.data
-            if allowed_file(file.filename):
+            if file and allowed_file(file.filename): # Check if file object exists and is allowed
                 filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
+                # Use absolute path for saving
                 save_path = os.path.join(UPLOAD_FOLDER, filename)
                 logger.debug(f"Attempting to save app image to {save_path}")
                 try:
@@ -224,7 +242,8 @@ def register():
                         logger.error(f"Failed to save app image to {save_path}")
                         flash('Failed to save app image.', 'danger')
                         return render_template('register.html', form=form)
-                    app_images.append(f"/app/uploads/{filename}")
+                    # Store URL path for web access
+                    app_images.append(f"/uploads/{filename}") # CHANGED
                 except Exception as e:
                     logger.error(f"Error saving app image to {save_path}: {e}")
                     flash('Error saving app image.', 'danger')
@@ -235,7 +254,7 @@ def register():
             description=form.description.data,
             developer=form.developer.data,
             contact_email=form.contact_email.data,
-            logo_url=logo_url or None,
+            logo_url=logo_url or None, # Use the potentially updated logo_url
             launch_url=form.launch_url.data,
             client_id=form.client_id.data,
             scopes=scopes,
@@ -247,7 +266,7 @@ def register():
             specialties=','.join(map(str, form.specialties.data)) if form.specialties.data else None,
             licensing_pricing_id=form.licensing_pricing.data,
             os_support=','.join(map(str, form.os_support.data)) if form.os_support.data else None,
-            app_images=','.join(app_images) if app_images else None,
+            app_images=','.join(app_images) if app_images else None, # Use the potentially updated app_images list
             ehr_support=','.join(map(str, form.ehr_support.data)) if form.ehr_support.data else None,
             user_id=current_user.id
         )
@@ -271,8 +290,9 @@ def edit_app(app_id):
     if app.user_id != current_user.id:
         flash('You can only edit your own apps.', 'danger')
         return redirect(url_for('gallery.app_detail', app_id=app_id))
-    
+
     form = SmartAppForm(obj=app)
+    # Pre-populate multi-select fields correctly on GET request
     if not form.is_submitted():
         if app.categories:
             form.categories.data = [int(cid) for cid in app.categories.split(',') if cid]
@@ -282,8 +302,14 @@ def edit_app(app_id):
             form.os_support.data = [int(oid) for oid in app.os_support.split(',') if oid]
         if app.ehr_support:
             form.ehr_support.data = [int(eid) for eid in app.ehr_support.split(',') if eid]
+        # Pre-populate the image URL textarea
         if app.app_images:
-            form.app_image_urls.data = '\n'.join(app.app_images.split(',') if app.app_images else [])
+             # Filter out internal paths if mixed with URLs, show only URLs or internal paths formatted for web
+            current_images = [img for img in app.app_images.split(',') if img.startswith(('http://', 'https://', '/uploads/'))]
+            form.app_image_urls.data = '\n'.join(current_images)
+        else:
+             form.app_image_urls.data = '' # Ensure it's empty if no images
+
 
     if form.validate_on_submit():
         scopes = form.scopes.data
@@ -298,6 +324,7 @@ def edit_app(app_id):
 
         # Ensure upload folder exists
         try:
+            # Use the absolute path inside the container
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
             logger.debug(f"Ensured {UPLOAD_FOLDER} exists")
         except Exception as e:
@@ -305,6 +332,7 @@ def edit_app(app_id):
             flash('Error creating upload directory.', 'danger')
             return render_template('edit_app.html', form=form, app=app)
 
+        # Handle new filter options (same as register)
         if form.application_type_new.data:
             app_type = ApplicationType(name=form.application_type_new.data)
             db.session.add(app_type)
@@ -314,11 +342,14 @@ def edit_app(app_id):
             category = Category(name=form.categories_new.data)
             db.session.add(category)
             db.session.commit()
+            # Ensure data is list before append if it was None initially
+            if form.categories.data is None: form.categories.data = []
             form.categories.data.append(category.id)
         if form.os_support_new.data:
             os_support = OSSupport(name=form.os_support_new.data)
             db.session.add(os_support)
             db.session.commit()
+            if form.os_support.data is None: form.os_support.data = []
             form.os_support.data.append(os_support.id)
         if form.fhir_compatibility_new.data:
             fhir = FHIRSupport(name=form.fhir_compatibility_new.data)
@@ -329,6 +360,7 @@ def edit_app(app_id):
             speciality = Speciality(name=form.specialties_new.data)
             db.session.add(speciality)
             db.session.commit()
+            if form.specialties.data is None: form.specialties.data = []
             form.specialties.data.append(speciality.id)
         if form.licensing_pricing_new.data:
             pricing = PricingLicense(name=form.licensing_pricing_new.data)
@@ -344,60 +376,70 @@ def edit_app(app_id):
             ehr = EHRSupport(name=form.ehr_support_new.data)
             db.session.add(ehr)
             db.session.commit()
+            if form.ehr_support.data is None: form.ehr_support.data = []
             form.ehr_support.data.append(ehr.id)
 
-        logo_url = form.logo_url.data
-        if form.logo_upload.data:
+
+        # Handle logo update
+        logo_url = form.logo_url.data # Get URL from form first
+        if form.logo_upload.data: # If new logo uploaded, it takes precedence
             file = form.logo_upload.data
             if allowed_file(file.filename):
                 filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
+                # Use absolute path for saving
                 save_path = os.path.join(UPLOAD_FOLDER, filename)
-                logger.debug(f"Attempting to save logo to {save_path}")
+                logger.debug(f"Attempting to save updated logo to {save_path}")
                 try:
                     file.save(save_path)
                     if os.path.exists(save_path):
-                        logger.debug(f"Successfully saved logo to {save_path}")
+                         logger.debug(f"Successfully saved updated logo to {save_path}")
                     else:
-                        logger.error(f"Failed to save logo to {save_path}")
-                        flash('Failed to save logo.', 'danger')
-                        return render_template('edit_app.html', form=form, app=app)
-                    logo_url = f"/app/uploads/{filename}"
+                         logger.error(f"Failed to save updated logo to {save_path}")
+                         flash('Failed to save logo.', 'danger')
+                         return render_template('edit_app.html', form=form, app=app)
+                    # Store URL path for web access
+                    logo_url = f"/uploads/{filename}" # CHANGED
                     logger.debug(f"Set logo_url to {logo_url}")
                 except Exception as e:
-                    logger.error(f"Error saving logo to {save_path}: {e}")
+                    logger.error(f"Error saving updated logo to {save_path}: {e}")
                     flash('Error saving logo.', 'danger')
                     return render_template('edit_app.html', form=form, app=app)
-        elif not logo_url:
-            logo_url = app.logo_url
+        elif not logo_url: # If no new upload AND URL field is empty, keep existing
+             logo_url = app.logo_url # Keep the old one only if the field is empty
 
-        app_images = []
-        if form.app_image_urls.data:
-            app_images.extend([url.strip() for url in form.app_image_urls.data.splitlines() if url.strip()])
-        if form.app_image_uploads.data:
+        # Handle app images update
+        # Start with URLs provided in the text area
+        app_images = [url.strip() for url in form.app_image_urls.data.splitlines() if url.strip()]
+
+        if form.app_image_uploads.data: # Check if a file was uploaded
             file = form.app_image_uploads.data
-            if allowed_file(file.filename):
+            if file and allowed_file(file.filename): # Check if file object exists and is allowed
                 filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
+                # Use absolute path for saving
                 save_path = os.path.join(UPLOAD_FOLDER, filename)
-                logger.debug(f"Attempting to save app image to {save_path}")
+                logger.debug(f"Attempting to save updated app image to {save_path}")
                 try:
                     file.save(save_path)
                     if os.path.exists(save_path):
-                        logger.debug(f"Successfully saved app image to {save_path}")
+                         logger.debug(f"Successfully saved updated app image to {save_path}")
                     else:
-                        logger.error(f"Failed to save app image to {save_path}")
-                        flash('Failed to save app image.', 'danger')
-                        return render_template('edit_app.html', form=form, app=app)
-                    app_images.append(f"/app/uploads/{filename}")
+                         logger.error(f"Failed to save updated app image to {save_path}")
+                         flash('Failed to save app image.', 'danger')
+                         return render_template('edit_app.html', form=form, app=app)
+                    # Add the new image's URL path
+                    app_images.append(f"/uploads/{filename}") # CHANGED
                 except Exception as e:
-                    logger.error(f"Error saving app image to {save_path}: {e}")
+                    logger.error(f"Error saving updated app image to {save_path}: {e}")
                     flash('Error saving app image.', 'danger')
                     return render_template('edit_app.html', form=form, app=app)
 
+
+        # Update app object
         app.name = form.name.data
         app.description = form.description.data
         app.developer = form.developer.data
         app.contact_email = form.contact_email.data
-        app.logo_url = logo_url or None
+        app.logo_url = logo_url # Use the final determined logo_url
         app.launch_url = form.launch_url.data
         app.client_id = form.client_id.data
         app.scopes = scopes
@@ -409,7 +451,7 @@ def edit_app(app_id):
         app.specialties = ','.join(map(str, form.specialties.data)) if form.specialties.data else None
         app.licensing_pricing_id = form.licensing_pricing.data
         app.os_support = ','.join(map(str, form.os_support.data)) if form.os_support.data else None
-        app.app_images = ','.join(app_images) if app_images else None
+        app.app_images = ','.join(app_images) if app_images else None # Use the final list of image URLs/paths
         app.ehr_support = ','.join(map(str, form.ehr_support.data)) if form.ehr_support.data else None
         try:
             db.session.commit()
@@ -421,7 +463,10 @@ def edit_app(app_id):
             return render_template('edit_app.html', form=form, app=app)
         flash('App updated successfully!', 'success')
         return redirect(url_for('gallery.app_detail', app_id=app_id))
+
+    # Render the edit form on GET or if validation fails
     return render_template('edit_app.html', form=form, app=app)
+
 
 @gallery_bp.route('/gallery/delete/<int:app_id>', methods=['POST'])
 @login_required
@@ -441,6 +486,7 @@ def my_listings():
     apps = SmartApp.query.filter_by(user_id=current_user.id).all()
     return render_template('my_listings.html', apps=apps)
 
+# Keep the test route as is, it uses placeholder URLs directly
 @gallery_bp.route('/test/add')
 @login_required
 def add_test_app():

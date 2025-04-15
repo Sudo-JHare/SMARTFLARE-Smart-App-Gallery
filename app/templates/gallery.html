@@ -154,41 +154,39 @@
     <!-- Custom CSS for Pretty UI -->
     <style>
         .navbar-light {
-            background-color: #ffffff !important;
-            border-bottom: 1px solid #e0e0e0;
+            background-color: var(--secondary-bg);
+            border-bottom: 1px solid var(--text-color);
         }
-        .navbar-brand {
-            font-weight: bold;
-            color: #007bff !important;
-        }
-        .nav-link {
-            color: #333 !important;
+        .navbar-light .nav-link {
+            color: var(--text-color);
             transition: color 0.2s ease;
         }
-        .nav-link:hover {
-            color: #007bff !important;
+        .navbar-light .nav-link:hover {
+            color: var(--link-color);
         }
-        .nav-link.active {
-            color: #007bff !important;
+        .navbar-light .nav-link.active {
+            color: var(--link-color);
             font-weight: bold;
-            border-bottom: 2px solid #007bff;
+            border-bottom: 2px solid var(--link-color);
         }
         .dropdown-menu {
             animation: fadeIn 0.3s ease;
             border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px var(--card-hover-shadow);
             border-radius: 8px;
+            background-color: var(--card-bg);
         }
         .dropdown-item {
             padding: 0.5rem 1rem;
             transition: background-color 0.2s ease;
+            color: var(--text-color);
         }
         .dropdown-item:hover {
-            background-color: #e9ecef;
+            background-color: var(--secondary-bg);
         }
         .dropdown-item.active {
-            background-color: #007bff;
-            color: white !important;
+            background-color: var(--link-color);
+            color: white;
         }
         .app-card {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -197,51 +195,23 @@
         }
         .app-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+            box-shadow: 0 6px 12px var(--card-hover-shadow);
         }
         .card-img-top {
-            background-color: #f8f9fa;
+            background-color: var(--secondary-bg);
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .dark-mode .navbar-light {
-            background-color: #343a40 !important;
+        [data-theme="dark"] .navbar-light {
             border-bottom: 1px solid #495057;
         }
-        .dark-mode .nav-link {
-            color: #f8f9fa !important;
+        [data-theme="dark"] .navbar-light .nav-link {
+            color: var(--text-color);
         }
-        .dark-mode .nav-link:hover, .dark-mode .nav-link.active {
-            color: #4dabf7 !important;
-            border-bottom: 2px solid #4dabf7;
-        }
-        .dark-mode .dropdown-menu {
-            background-color: #495057;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        .dark-mode .dropdown-item {
-            color: #f8f9fa;
-        }
-        .dark-mode .dropdown-item:hover {
-            background-color: #6c757d;
-        }
-        .dark-mode .dropdown-item.active {
-            background-color: #4dabf7;
-        }
-        .dark-mode .app-card {
-            background-color: #343a40;
-            color: #f8f9fa;
-        }
-        .dark-mode .card-img-top {
-            background-color: #495057;
-        }
-        .dark-mode .text-muted {
-            color: #adb5bd !important;
-        }
-        .dark-mode .navbar-brand {
-            color: #4dabf7 !important;
+        [data-theme="dark"] .navbar-light .nav-link:hover, [data-theme="dark"] .navbar-light .nav-link.active {
+            color: var(--link-color);
         }
     </style>
 {% endblock %}
